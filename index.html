@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Business Intelligence Quiz – Teil 1</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --primary: #1e40af;       /* Classic BI Indigo-Blue */
+    --primary-glow: #3b82f6; 
+    --primary-light: #eff6ff;
+    --success: #0d9488;      /* Teal/Green KPI */
+    --success-light: #f0fdfa;
+    --danger: #e11d48;       /* Crimson Falsch KPI */
+    --danger-light: #fff1f2;
+    --warning: #d97706;      /* Amber Caution */
+    --warning-light: #fef3c7;
+    --text: #0f172a;         /* Deep Slate Main Text */
+    --text-muted: #475569;   /* Slate Muted Text */
+    --border: #cbd5e1;       /* Gray-300 Border */
+    --bg: #f8fafc;           /* Light Sky gray background */
+    --card: #ffffff;
+    --radius: 12px;
+    --shadow: 0 4px 12px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.08);
+  }
+
+  body {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2.5rem 1rem;
+    line-height: 1.6;
+  }
+
+  .container { 
+    max-width: 800px; 
+    margin: 0 auto; 
+  }
+
+  /* Custom BI Dashboard Header Style */
+  .header { 
+    text-align: center; 
+    margin-bottom: 2rem; 
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+    padding: 2.25rem 1.75rem;
+    border-radius: 16px;
+    box-shadow: var(--shadow-lg);
+    color: white;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 99px;
+    margin-bottom: 1rem;
+  }
+
+  .header h1 { 
+    font-size: 2.2rem; 
+    font-weight: 800; 
+    letter-spacing: -0.02em;
+    color: white; 
+    margin-bottom: 0.5rem; 
+  }
+
+  .header p  { 
+    color: #94a3b8; 
+    font-size: 1rem; 
+    font-weight: 500;
+  }
+
+  /* Slick Progress tracking section */
+  .progress-wrap {
+    background: #e2e8f0;
+    border-radius: 99px;
+    height: 10px;
+    margin-bottom: 0.5rem;
+    overflow: hidden;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--primary-glow) 100%);
+    border-radius: 99px;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .progress-info {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* Business Intelligence Styled KPI Cards Grid */
+  .stats-row { 
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px; 
+    margin-bottom: 1.5rem; 
+  }
+
+  .stat-pill {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 12px 6px;
+    border-radius: var(--radius);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: white;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .stat-pill:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px -2px rgb(0 0 0 / 0.08);
+  }
+
+  .stat-pill .dot {
+    display: none; /* Replaced by beautiful metric styling */
+  }
+
+  .stat-pill span[id] {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 20px;
+    font-weight: 850;
+    margin-top: 4px;
+    line-height: 1.1;
+  }
+
+  .stat-pill.correct { 
+    border-color: #a7f3d0; 
+    background: #f0fdf4; 
+    color: #047857; 
+  }
+  .stat-pill.correct span[id] { color: #059669; }
+
+  .stat-pill.wrong { 
+    border-color: #fecdd3; 
+    background: #fff5f5; 
+    color: #be123c; 
+  }
+  .stat-pill.wrong span[id] { color: #e11d48; }
+
+  .stat-pill.skip { 
+    border-color: var(--border); 
+    background: #f8fafc; 
+    color: var(--text-muted); 
+  }
+  .stat-pill.skip span[id] { color: #475569; }
+
+  /* Elegant Question Box (styled like a worksheet card) */
+  .question-card {
+    background: var(--card);
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 2.25rem 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+  }
+
+  .question-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--primary-glow) 100%);
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+  }
+
+  .question-label {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--primary);
+    background: var(--primary-light);
+    padding: 4px 10px;
+    border-radius: 6px;
+    display: inline-block;
+    margin-bottom: 1.2rem;
+    border: 1px solid rgba(30, 64, 175, 0.1);
+  }
+
+  .question-text { 
+    font-size: 1.2rem; 
+    font-weight: 700; 
+    color: #0f172a; 
+    line-height: 1.5; 
+    letter-spacing: -0.01em;
+  }
+
+  .options { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 12px; 
+    margin-top: 1.75rem; 
+  }
+
+  /* Beautiful Interactive Option Buttons */
+  .option-btn {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 1rem 1.25rem;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    background: white;
+    cursor: pointer;
+    text-align: left;
+    font-size: 0.98rem;
+    font-weight: 500;
+    color: #334155;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    outline: none;
+  }
+
+  .option-btn:hover:not(:disabled) { 
+    border-color: var(--primary-glow); 
+    background: var(--primary-light); 
+    box-shadow: 0 4px 8px rgba(37, 99, 235, 0.04);
+    color: var(--primary);
+  }
+
+  .option-btn:disabled { 
+    cursor: default; 
+  }
+
+  .option-letter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    border-radius: 8px;
+    background: #f1f5f9;
+    font-size: 13px;
+    font-weight: 700;
+    color: #64748b;
+    border: 1.5px solid #e2e8f0;
+    transition: all 0.15s;
+  }
+
+  .option-btn:hover:not(:disabled) .option-letter { 
+    background: var(--primary); 
+    color: white; 
+    border-color: var(--primary);
+  }
+
+  /* Success Options Styles */
+  .option-btn.correct { 
+    border-color: #059669; 
+    background: #ecfdf5; 
+    color: #065f46;
+  }
+  .option-btn.correct .option-letter { 
+    background: #059669; 
+    color: white; 
+    border-color: #059669;
+  }
+
+  /* Incorrect Options Styles */
+  .option-btn.wrong { 
+    border-color: #e11d48; 
+    background: #fff1f2; 
+    color: #9f1239;
+  }
+  .option-btn.wrong .option-letter { 
+    background: #e11d48; 
+    color: white; 
+    border-color: #e11d48;
+  }
+
+  /* Revealed Correct Options (when user selected wrong answer, correct is highlighted) */
+  .option-btn.revealed-correct { 
+    border-color: #059669; 
+    background: #ecfdf5; 
+    opacity: 0.85; 
+    color: #065f46;
+  }
+  .option-btn.revealed-correct .option-letter { 
+    background: #059669; 
+    color: white; 
+    border-color: #059669;
+  }
+
+  .check-icon { 
+    margin-left: auto; 
+    font-size: 18px; 
+    flex-shrink: 0; 
+    align-self: center; 
+  }
+
+  /* Polished explanation text box */
+  .feedback {
+    display: none;
+    padding: 1.25rem 1.5rem;
+    border-radius: 10px;
+    margin-top: 1.25rem;
+    font-size: 0.92rem;
+    font-weight: 500;
+    line-height: 1.6;
+    border-left: 5px solid transparent;
+  }
+
+  .feedback.show { 
+    display: flex; 
+    align-items: flex-start; 
+    gap: 12px; 
+  }
+
+  .feedback.correct-fb { 
+    background: #f0fdf4; 
+    color: #166534; 
+    border: 1px solid #bbf7d0;
+    border-left: 5px solid #16a34a;
+  }
+
+  .feedback.wrong-fb { 
+    background: #fff5f5; 
+    color: #9f1239; 
+    border: 1px solid #fecdd3;
+    border-left: 5px solid #e11d48;
+  }
+
+  .feedback.skip-fb { 
+    background: #f8fafc; 
+    color: #334155; 
+    border: 1px solid #e2e8f0;
+    border-left: 5px solid #64748b;
+  }
+
+  .feedback-icon {
+    font-size: 20px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .feedback-title {
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+
+  /* Command Buttons Style */
+  .nav-row { 
+    display: flex; 
+    gap: 12px; 
+    justify-content: flex-end; 
+    flex-wrap: wrap; 
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    box-shadow: var(--shadow);
+  }
+
+  .btn-primary { 
+    background: var(--primary); 
+    color: white; 
+  }
+  .btn-primary:hover { 
+    background: #1d4ed8; 
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(30, 58, 138, 0.2);
+  }
+
+  .btn-outline { 
+    background: white; 
+    color: #475569; 
+    border: 1.5px solid #cbd5e1; 
+  }
+  .btn-outline:hover { 
+    background: #f1f5f9; 
+    border-color: #94a3b8;
+    color: #0f172a;
+  }
+
+  .btn-finish { 
+    background: #0d9488; 
+    color: white; 
+  }
+  .btn-finish:hover { 
+    background: #0f766e; 
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(13, 148, 136, 0.2);
+  }
+
+  /* Restart confirmation layout styles */
+  #restart-confirm-box {
+    background: #fffbeb !important;
+    border: 1.5px solid #fde68a !important;
+    color: #92400e;
+    border-left: 5px solid #d97706 !important;
+  }
+
+  /* Diagnostic Results Screen Styles (BI themed) */
+  .result-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 3rem 2rem;
+    text-align: center;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .score-ring { 
+    width: 140px; 
+    height: 140px; 
+    margin: 0 auto 1.5rem; 
+    position: relative; 
+  }
+
+  .score-ring svg { 
+    transform: rotate(-90deg); 
+  }
+
+  .ring-bg { 
+    fill: none; 
+    stroke: #f1f5f9; 
+    stroke-width: 12; 
+  }
+
+  .ring-fill { 
+    fill: none; 
+    stroke-width: 12; 
+    stroke-linecap: round; 
+    stroke: var(--primary);
+    transition: stroke-dashoffset 1.2s ease-out; 
+  }
+
+  .score-label {
+    position: absolute; 
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 1.8rem; 
+    font-weight: 800;
+    color: #0f172a;
+  }
+
+  .result-title { 
+    font-size: 1.8rem; 
+    font-weight: 800; 
+    color: #0f172a;
+    margin-bottom: 0.5rem; 
+    letter-spacing: -0.012em;
+  }
+
+  .result-sub { 
+    color: var(--text-muted); 
+    font-size: 1rem; 
+    margin-bottom: 2rem; 
+  }
+
+  .result-grid { 
+    display: grid; 
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 16px; 
+  }
+
+  .result-metric { 
+    padding: 1.25rem 0.5rem; 
+    border-radius: 12px; 
+    border: 1px solid transparent;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .result-metric .num { 
+    font-family: "JetBrains Mono", monospace;
+    font-size: 1.75rem; 
+    font-weight: 800; 
+  }
+
+  .result-metric .lbl { 
+    font-size: 11px; 
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-muted); 
+    margin-top: 4px; 
+    letter-spacing: 0.05em;
+  }
+
+  .result-metric.g { background: #f0fdf4; border-color: #bbf7d0; }
+  .result-metric.g .num { color: #0d9488; }
+  .result-metric.r { background: #fff1f2; border-color: #fecdd3; }
+  .result-metric.r .num { color: #e11d48; }
+  .result-metric.b { background: #f0f9ff; border-color: #bae6fd; }
+  .result-metric.b .num { color: #0284c7; }
+
+  .grade-bar {
+    margin: 2rem auto 0;
+    padding: 1.25rem;
+    border-radius: 12px;
+    font-size: 1.05rem;
+    font-weight: 850;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    border: 1px solid transparent;
+    max-width: 500px;
+    box-shadow: var(--shadow);
+    text-align: center;
+  }
+
+  .result-btns { 
+    display: flex; 
+    gap: 14px; 
+    justify-content: center; 
+    flex-wrap: wrap; 
+    margin-top: 1.5rem; 
+  }
+
+  /* Detail review cards list */
+  .review-section { 
+    margin-top: 2.5rem; 
+  }
+
+  .review-section h2 { 
+    font-size: 1.25rem; 
+    font-weight: 800; 
+    color: #0f172a;
+    margin-bottom: 1.25rem; 
+  }
+
+  .review-item {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+    box-shadow: var(--shadow);
+    position: relative;
+  }
+
+  .review-item.ok { border-left: 6px solid #0d9488; }
+  .review-item.nok { border-left: 6px solid #e11d48; }
+
+  .review-q { 
+    font-weight: 700; 
+    color: #0f172a;
+    margin-bottom: 0.6rem; 
+  }
+
+  .review-a { 
+    color: var(--text-muted); 
+    font-weight: 500;
+    line-height: 1.5;
+  }
+
+  .ok-txt  { color: #0d9488; font-weight: 700; }
+  .nok-txt { color: #e11d48; font-weight: 700; }
+
+  .kb-hint { 
+    text-align: center; 
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px; 
+    color: #94a3b8; 
+    margin-top: 1.5rem; 
+    font-weight: 500;
+  }
+
+  @media (max-width: 600px) {
+    .stats-row { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .result-grid { grid-template-columns: 1fr; gap: 12px; }
+    .header h1 { font-size: 1.6rem; }
+    .container { padding: 1rem 0; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="badge">Wirtschaftsakademie Wien · BI Kurs Teil 1</div>
+    <h1>Business Intelligence</h1>
+    <p>40 Multiple-Choice-Fragen · Datenmanagement &amp; Architektur</p>
+  </div>
+
+  <div id="quiz-screen">
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progress-bar" style="width:0%"></div>
+    </div>
+    <div class="progress-info">
+      <span id="progress-pct">0 % abgeschlossen</span>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-pill correct"><span class="dot green"></span><span id="stat-correct">0</span> Richtig</div>
+      <div class="stat-pill wrong"><span class="dot red"></span><span id="stat-wrong">0</span> Falsch</div>
+      <div class="stat-pill skip"><span class="dot gray"></span><span id="stat-skip">40</span> Offen</div>
+    </div>
+
+    <div class="question-card">
+      <div class="question-label" id="q-label">Themenbereich</div>
+      <div class="question-text" id="q-text"></div>
+      <div class="options" id="options-container"></div>
+      <div class="feedback" id="feedback"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-outline" id="btn-prev" onclick="navigate(-1)">← Zurück</button>
+      <button class="btn btn-outline" id="btn-skip" onclick="skipQuestion()">Überspringen</button>
+      <button class="btn btn-primary" id="btn-next" onclick="navigate(1)">Weiter →</button>
+      <button class="btn btn-finish" id="btn-finish" onclick="finishQuiz()" style="display:none">Auswertung anzeigen</button>
+    </div>
+
+    <!-- Test neu starten Button / Confirm Dialog -->
+    <div style="display: flex; justify-content: center; margin-top: 1.5rem; margin-bottom: 0.5rem;">
+      <div id="restart-confirm-box" style="display: none; align-items: center; justify-content: center; gap: 12px; background: var(--warning-light); border: 1px solid #faeeda; padding: 10px 15px; border-radius: 8px; width: 100%; max-width: 480px; text-align: center;">
+        <span style="font-size: 13px; color: var(--warning); font-weight: 600;">Quiz wirklich ablegen und von vorne beginnen?</span>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn" style="padding: 4px 12px; font-size: 12px; background: var(--danger); color: white;" onclick="confirmRestart(true)">Ja, neu starten</button>
+          <button class="btn btn-outline" style="padding: 4px 12px; font-size: 12px;" onclick="confirmRestart(false)">Abbrechen</button>
+        </div>
+      </div>
+      <button class="btn btn-outline" id="btn-restart-quiz" onclick="requestRestart()" style="color: #6b7280; font-size: 0.85rem; padding: 0.5rem 1.2rem; border-color: #e5e7eb; display: inline-flex; align-items: center; gap: 6px;">
+        🔄 Test neu starten
+      </button>
+    </div>
+
+    <div class="kb-hint">Tastatur: A B C D zum Antworten &nbsp;·&nbsp; → Weiter &nbsp;·&nbsp; ← Zurück &nbsp;·&nbsp; S Überspringen</div>
+  </div>
+
+  <div id="result-screen">
+    <div class="result-card">
+      <div class="score-ring">
+        <svg width="120" height="120" viewBox="0 0 120 120">
+          <circle class="ring-bg"   cx="60" cy="60" r="50"></circle>
+          <circle class="ring-fill" id="ring-fill" cx="60" cy="60" r="50"
+            stroke-dasharray="314" stroke-dashoffset="314"></circle>
+        </svg>
+        <div class="score-label" id="score-pct-label">0%</div>
+      </div>
+      <div class="result-title" id="result-title">Ergebnis</div>
+      <div class="result-sub"   id="result-sub"></div>
+      <div class="result-grid">
+        <div class="result-metric g"><div class="num" id="r-correct">0</div><div class="lbl">Richtig</div></div>
+        <div class="result-metric r"><div class="num" id="r-wrong">0</div><div class="lbl">Falsch</div></div>
+        <div class="result-metric b"><div class="num" id="r-skip">0</div><div class="lbl">Übersprungen</div></div>
+      </div>
+      <div class="grade-bar" id="grade-bar"></div>
+    </div>
+
+    <div class="result-btns">
+      <button class="btn btn-primary" onclick="restartQuiz()">Quiz neu starten 🔄</button>
+      <button class="btn btn-outline" onclick="toggleReview()">Alle Fragen ansehen</button>
+    </div>
+
+    <div class="review-section" id="review-section" style="display:none">
+      <h2>Detailauswertung</h2>
+      <div id="review-list"></div>
+    </div>
+  </div>
+
+</div>
+<script>
+const ALL_QUESTIONS = [
+  {
+    text: "Was ist das primäre Ziel von Business Intelligence?",
+    options: [
+      "Die vollständige Automatisierung aller Geschäftsprozesse durch regelbasierte Systeme ohne menschliche Eingriffe.",
+      "Die Umwandlung roher Unternehmensdaten in entscheidungsrelevantes Wissen zur Unterstützung faktenbasierter Entscheidungen.",
+      "Die zentrale Speicherung aller Kundendaten in einem einheitlichen System für Marketingzwecke.",
+      "Die schrittweise Ablösung operativer Einzelsysteme durch eine konsolidierte Unternehmensdatenbank."
+    ],
+    correct: 1, topic: "Grundlagen"
+  },
+  {
+    text: "Welche Komponente ist kein zwingender Bestandteil einer BI-Lösung?",
+    options: [
+      "Quellsysteme wie ERP- oder CRM-Anwendungen, die operative Daten liefern.",
+      "Eine ETL-Strecke, die Daten extrahiert, transformiert und in das Zielsystem lädt.",
+      "Ein internes soziales Netzwerk, über das Mitarbeiter Daten und Analysen teilen.",
+      "Ein Data Warehouse oder eine vergleichbare Analysedatenbank als zentraler Datenspeicher."
+    ],
+    correct: 2, topic: "Architektur"
+  },
+  {
+    text: "Wie unterstützt BI datenbasierte Entscheidungen?",
+    options: [
+      "Indem sie historische Umsatzdaten unverändert in tabellarischer Form für das Management bereitstellt.",
+      "Indem sie Managemententscheidungen durch visuelle Aufbereitung bestehender Annahmen grafisch untermauert.",
+      "Indem sie Daten sammelt, bereinigt, analysiert und so aufbereitet, dass Entscheider Muster und Abweichungen unmittelbar erkennen können.",
+      "Indem sie Entscheidungen auf Basis definierter Schwellenwerte automatisch trifft und ohne Rückfrage umsetzt."
+    ],
+    correct: 2, topic: "Grundlagen"
+  },
+  {
+    text: "Welche der folgenden Quellen ist typischerweise keine interne Datenquelle eines BI-Systems?",
+    options: [
+      "Das ERP-System mit Finanz-, Einkaufs- und Warenwirtschaftsdaten des Unternehmens.",
+      "Marktforschungsberichte eines externen Instituts zu Branchentrends und Wettbewerbsumfeld.",
+      "Das CRM-System mit Kundenkontakten, Vertriebschancen und Interaktionshistorie.",
+      "Excel-Dateien des Controllings mit manuell gepflegten Budget- und Planungszahlen."
+    ],
+    correct: 1, topic: "Datenquellen"
+  },
+  {
+    text: "Welche Aussage beschreibt den Unterschied zwischen einem Data Warehouse und einem Data Lake?",
+    options: [
+      "Ein Data Lake speichert ausschließlich strukturierte Tabellendaten, während ein Data Warehouse auch unstrukturierte Formate verwaltet.",
+      "Ein Data Warehouse legt das Schema beim Schreiben fest, während ein Data Lake das Schema erst beim Lesen der Daten anwendet.",
+      "Ein Data Lake ist grundsätzlich auf kleinere Datenvolumen ausgelegt als ein Data Warehouse.",
+      "Beide Konzepte beschreiben denselben technischen Ansatz und unterscheiden sich lediglich im Namen."
+    ],
+    correct: 1, topic: "Architektur"
+  },
+  {
+    text: "Welche Auswirkung hat schlechte Datenqualität auf BI-Analysen?",
+    options: [
+      "Dashboards benötigen länger zum Laden, liefern aber inhaltlich weiterhin korrekte Kennzahlen.",
+      "Verschiedene Abteilungen erhalten widersprüchliche Kennzahlen, was das Vertrauen in die BI-Lösung untergräbt und zu Fehlentscheidungen führt.",
+      "Moderne BI-Werkzeuge erkennen fehlerhafte Datensätze automatisch und korrigieren sie ohne manuellen Eingriff.",
+      "Qualitätsmängel in den Rohdaten wirken sich nicht messbar auf strategische Geschäftsentscheidungen aus."
+    ],
+    correct: 1, topic: "Datenqualität"
+  },
+  {
+    text: "Welcher Mechanismus gehört zu den automatisierten Data-Quality-Checks?",
+    options: [
+      "Tägliche manuelle Sichtprüfung neu eingegangener Datensätze durch einen fachlich verantwortlichen Data Steward.",
+      "Regelbasierte Validierungen, die leere Pflichtfelder oder unplausible Wertebereiche bereits im ETL-Prozess erkennen und ausleiten.",
+      "Nachträgliche Korrekturen von Berichtswerten durch Führungskräfte nach der Veröffentlichung.",
+      "Automatisches Löschen von Datensätzen, deren Werte um mehr als eine definierte Schwelle vom Mittelwert abweichen."
+    ],
+    correct: 1, topic: "Datenqualität"
+  },
+  {
+    text: "Welche Funktion übernehmen ETL-Tools in der Datenaufbereitung?",
+    options: [
+      "Sie sind ausschließlich für die grafische Gestaltung und Darstellung von Analyse-Dashboards zuständig.",
+      "Sie extrahieren Daten aus Quellsystemen, transformieren sie in ein analysefähiges Format und laden sie in das Zielsystem.",
+      "Sie übernehmen die Funktion des Data Warehouse als zentrale Speicher- und Verwaltungseinheit.",
+      "Sie kontrollieren Zugriffsrechte und verhindern, dass unbefugte Nutzer auf sensible Unternehmensdaten zugreifen."
+    ],
+    correct: 1, topic: "ETL"
+  },
+  {
+    text: "Welcher Mehrwert entsteht durch die Kombination interner und externer Datenquellen?",
+    options: [
+      "Interne Datensätze werden durch die Verknüpfung mit externen Quellen automatisch um Fehler bereinigt.",
+      "Externe Datenquellen ersetzen die Notwendigkeit eines zentralen Data Warehouse im Unternehmen.",
+      "Interne Daten zeigen die eigene Unternehmensleistung, während externe Daten den Marktkontext liefern und einen Wettbewerbsvergleich ermöglichen.",
+      "Externe Daten werden ausschließlich für die Bonitätsprüfung und Risikobewertung von Neukunden herangezogen."
+    ],
+    correct: 2, topic: "Datenquellen"
+  },
+  {
+    text: "Welches Element ist Teil einer gut durchdachten BI-Architektur?",
+    options: [
+      "Eine Präsentationsschicht, die Berichte direkt aus den operativen Quellsystemen ohne Zwischenspeicherung abruft.",
+      "Eine zentrale Semantikschicht, die verbindliche und einheitliche Definitionen für Kennzahlen wie den Nettoumsatz bereitstellt.",
+      "Der bewusste Verzicht auf Dokumentation, um schnelle Anpassungen ohne bürokratischen Aufwand zu ermöglichen.",
+      "Die ausschließliche Speicherung aller Unternehmensdaten in lokal verwalteten Excel-Arbeitsmappen."
+    ],
+    correct: 1, topic: "Architektur"
+  },
+  {
+    text: "Welche Maßnahme hilft, Datenchaos in BI-Prozessen zu vermeiden?",
+    options: [
+      "Jede Abteilung pflegt ihre Datenbestände und Definitionen eigenverantwortlich und ohne zentrale Abstimmung.",
+      "Die Einführung zertifizierter Datensätze mit einem Qualitätsgütesiegel, die als verbindliche Grundlage für alle Berichte dienen.",
+      "Der vollständige Verzicht auf Metadaten, um den Verwaltungsaufwand im BI-System zu minimieren.",
+      "Die Ablage aller Rohdaten in einem einzigen, undokumentierten Data Lake ohne Governance-Regeln."
+    ],
+    correct: 1, topic: "Datenqualität"
+  },
+  {
+    text: "Wovon profitieren Unternehmen bei der Automatisierung ihrer BI-Pipelines?",
+    options: [
+      "Manuelle Eingriffe in die Datenaufbereitung bleiben weiterhin notwendig, um kreative Analyseperspektiven zu sichern.",
+      "Vollständig automatisierte Pipelines erfordern keinerlei Überwachung, da sie technisch fehlerfrei arbeiten.",
+      "Automatisierte Pipelines reduzieren menschliche Fehler in der Datenaufbereitung und stellen sicher, dass Dashboards pünktlich mit konsistenten Daten befüllt werden.",
+      "Die Automatisierung von BI-Pipelines wirkt sich ausschließlich auf die Reduktion von Hardwarekosten aus."
+    ],
+    correct: 2, topic: "Automatisierung"
+  },
+  {
+    text: "Was bedeutet \"Single Source of Truth\" im BI-Kontext?",
+    options: [
+      "Ein dedizierter physischer Server, auf dem sämtliche Unternehmensdaten zentral und ausschließlich gespeichert werden.",
+      "Eine gesetzliche Meldepflicht, die Unternehmen verpflichtet, bestimmte Datensätze an Aufsichtsbehörden zu übermitteln.",
+      "Das Prinzip, dass jede geschäftsrelevante Kennzahl genau eine verbindliche Datenquelle hat, die von allen Abteilungen gemeinsam genutzt wird.",
+      "Ein spezialisierter Bereinigungsalgorithmus, der widersprüchliche Datensätze automatisch auf einen einheitlichen Wert normiert."
+    ],
+    correct: 2, topic: "Grundlagen"
+  },
+  {
+    text: "Was unterscheidet Batch-Verarbeitung von Echtzeitdatenanalyse?",
+    options: [
+      "Batch-Verarbeitung liefert Analyseergebnisse grundsätzlich schneller als jede Form der Echtzeitverarbeitung.",
+      "Batch-Verarbeitung sammelt Daten über einen definiertem Zeitraum und verarbeitet sie gebündelt, während Echtzeitanalyse Daten kontinuierlich im Moment ihres Entstehens verarbeitet.",
+      "Echtzeitanalyse ist technisch nur in Verbindung mit externen Datenquellen und Cloud-Diensten realisierbar.",
+      "Beide Verfahren unterscheiden sich ausschließlich in ihrer Bezeichnung, die zugrunde liegende Technologie ist identisch."
+    ],
+    correct: 1, topic: "Datenverarbeitung"
+  },
+  {
+    text: "Welchen Beitrag leisten Data Catalogs zur Datenverwaltung in BI?",
+    options: [
+      "Sie ersetzen das Data Warehouse durch eine schlankere und kostengünstigere Speicheralternative.",
+      "Sie bieten eine durchsuchbare Übersicht über verfügbare Datenquellen, deren fachliche Bedeutung, Verantwortlichkeiten und Qualitätsstatus.",
+      "Sie sind ausschließlich für die sichere Speicherung personenbezogener Kundendaten gemäß DSGVO zuständig.",
+      "Sie automatisieren die Lohnbuchhaltung durch direkte Anbindung an das HR-System des Unternehmens."
+    ],
+    correct: 1, topic: "Datenverwaltung"
+  },
+  {
+    text: "Welche Konsequenz droht ohne regelmäßige Aktualisierung der Daten im BI-System?",
+    options: [
+      "Das BI-System wird durch einen automatischen Schutzmechanismus abgeschaltet, sobald die Daten ein definiertes Alter überschreiten.",
+      "Dashboards zeigen veraltete Kennzahlen, und das Vertrauen der Entscheider in die Datenbasis schwindet, was die Akzeptanz der BI-Lösung gefährdet.",
+      "Die Datenqualität verbessert sich langfristig, weil keine neuen fehlerhaften Datensätze mehr in das System gelangen.",
+      "Das Data Warehouse erzielt Performancegewinne, weil durch ausbleibende Updates der Speicherbedarf sinkt."
+    ],
+    correct: 1, topic: "Datenqualität"
+  },
+  {
+    text: "Welches Problem tritt typischerweise bei der Integration großer Datenmengen auf?",
+    options: [
+      "Sehr große Datenmengen werden beim Integrationsprozess automatisch komprimiert und dadurch kleiner.",
+      "Die Heterogenität von Formaten, Granularität und Aktualisierungsfrequenzen verschiedener Quellsysteme führt zu Synchronisationsproblemen und Inkonsistenzen.",
+      "Daten ab einem bestimmten Volumen können technisch nicht mehr in ein relationales Data Warehouse geladen werden.",
+      "Die Nutzung von ETL-Tools ist bei der Integration großer Datenmengen aus Lizenzgründen ausgeschlossen."
+    ],
+    correct: 1, topic: "Integration"
+  },
+  {
+    text: "Wie unterstützen Cloud-Technologien die effiziente Verarbeitung von Big Data?",
+    options: [
+      "Cloud-Dienste sind auf kleinere Datenvolumen ausgelegt und eignen sich nicht für die Verarbeitung von Big Data.",
+      "Sie stellen skalierbare Rechenleistung und Speicherkapazität bedarfsgerecht bereit, sodass große Datenmengen ohne eigene Hardwareinvestitionen verarbeitet werden können.",
+      "Der Einsatz von Cloud-Infrastruktur macht eine strukturierte Datenmodellierung im Unternehmen vollständig überflüssig.",
+      "In Cloud-Umgebungen können ausschließlich strukturierte, relationale Datensätze gespeichert und verarbeitet werden."
+    ],
+    correct: 1, topic: "Cloud & Big Data"
+  },
+  {
+    text: "Was beschreiben die 3Vs von Big Data?",
+    options: [
+      "Verkaufszahlen, Verlustquoten und Vermögenswerte als zentrale Finanzkennzahlen eines Unternehmens.",
+      "Volume, Velocity und Variety – also die Datenmenge, die Verarbeitungsgeschwindigkeit und die Vielfalt der Datenformate.",
+      "Vertrauen, Verantwortung und Vision als strategische Leitprinzipien eines datengetriebenen Unternehmens.",
+      "Validierung, Versionierung und Visualisierung als Kernprozesse im Qualitätsmanagement von BI-Systemen."
+    ],
+    correct: 1, topic: "Cloud & Big Data"
+  },
+  {
+    text: "Wie verbessern Datenkompression und Partitionierung die BI-Performance?",
+    options: [
+      "Kompression erhöht den Speicherbedarf für Indexstrukturen, während Partitionierung die Abfragegeschwindigkeit reduziert.",
+      "Partitionierung unterteilt große Tabellen in kleinere Segmente, sodass Abfragen nur relevante Teilbereiche durchsuchen, und Kompression senkt den Speicherbedarf bei gleichzeitig höherer Lesegeschwindigkeit.",
+      "Beide Techniken dienen ausschließlich der Verschlüsselung und dem Schutz sensibler Unternehmensdaten.",
+      "Sie ersetzen die Notwendigkeit eines strukturierten Data Warehouse durch effizientere Speichermechanismen."
+    ],
+    correct: 1, topic: "Performance"
+  },
+  {
+    text: "Welche Strategie eignet sich zur Optimierung der Datenkonsolidierung?",
+    options: [
+      "Jede Abteilung verwaltet ihre eigenen Datensilos eigenständig, ohne Abstimmung mit einer zentralen Datenstelle.",
+      "Die Einführung einer verbindlichen zentralen Datenquelle mit standardisierten Definitionen und einem geregelten Onboarding-Prozess für neue Datenquellen.",
+      "Der vollständige Verzicht auf Datenbereinigungsschritte, um die Integrationsgeschwindigkeit zu maximieren.",
+      "Die ausschließliche Nutzung externer Datenprovider, da diese im Gegensatz zu internen Quellen fehlerfrei aufbereitet sind."
+    ],
+    correct: 1, topic: "Integration"
+  },
+  {
+    text: "Welche Aufgabe hat die Datenvalidierung in der Qualitätssicherung?",
+    options: [
+      "Sie löscht automatisch alle Datensätze, die ein bestimmtes Alter überschreiten oder seit längerer Zeit nicht aktualisiert wurden.",
+      "Sie prüft Daten auf die Einhaltung definierter Regeln wie Wertebereiche, Pflichtfelder und referenzielle Integrität, bevor sie in das Data Warehouse geladen werden.",
+      "Sie übernimmt die eigenständige Erstellung und Konfiguration von Analyse-Dashboards ohne menschliche Eingabe.",
+      "Sie ersetzt den ETL-Prozess vollständig durch direkte Echtzeit-Datenübertragung aus den Quellsystemen."
+    ],
+    correct: 1, topic: "Datenqualität"
+  },
+  {
+    text: "Wie tragen Data Stewards zur Vermeidung inkonsistenter Daten bei?",
+    options: [
+      "Sie entwickeln und warten eigenständig die technischen ETL-Pipelines und Datenbankskripte.",
+      "Sie tragen fachliche Verantwortung für Qualität und konsistente Definition eines Datenbestands und entscheiden bei Unklarheiten wie potenziellen Duplikaten über die korrekte Behandlung.",
+      "Sie legen in Abstimmung mit der Geschäftsführung die Vergütungsstruktur für BI-Analysten fest.",
+      "Sie übernehmen operativ die Aufgaben der IT-Abteilung im Bereich Datenbankadministration und Systemwartung."
+    ],
+    correct: 1, topic: "Datenverwaltung"
+  },
+  {
+    text: "Welche Maßnahme verbessert die Integration unterschiedlicher Datenquellen?",
+    options: [
+      "Die vollständige Migration aller Quellsysteme auf ein einziges, einheitliches Datenbankprodukt.",
+      "Die Definition einer einheitlichen Transformationslogik im ETL-Prozess, die abweichende Bezeichnungen, Formate und Kodierungen systematisch harmonisiert.",
+      "Der Ausschluss externer Datenquellen aus dem BI-System, da diese aufgrund fehlender Standards grundsätzlich inkompatibel sind.",
+      "Die manuelle Zusammenführung aller Datenquellen durch einen zentralen Datenverantwortlichen ohne technische Unterstützung."
+    ],
+    correct: 1, topic: "ETL"
+  },
+  {
+    text: "Wie kann die Datenbereinigung automatisiert werden?",
+    options: [
+      "Indem alle eingehenden Datensätze ohne vorherige Prüfung direkt und unverändert in das Data Warehouse übernommen werden.",
+      "Durch regelbasierte Validierungen und Plausibilitätsprüfungen, die fehlerhafte Datensätze automatisch erkennen und in einen Quarantänebereich ausleiten.",
+      "Durch den generellen Ausschluss nicht-numerischer Datentypen, da diese nicht automatisiert geprüft werden können.",
+      "Indem die Verantwortung für die Datenbereinigung vollständig an externe Dienstleister ausgelagert wird."
+    ],
+    correct: 1, topic: "Datenqualität"
+  },
+  {
+    text: "Welche Rolle spielen Metadatenmanagement und Dokumentation in BI?",
+    options: [
+      "Sie sind eine optionale Ergänzung und werden primär für externe Audits und Compliance-Prüfungen benötigt.",
+      "Sie schaffen Transparenz über Herkunft, Bedeutung und Transformationshistorie von Daten und sind unverzichtbar für Nachvollziehbarkeit und Vertrauen in BI-Ergebnisse.",
+      "Sie ersetzen das Data Warehouse als zentrale Datenverwaltungsinstanz durch eine leichtgewichtigere Alternative.",
+      "Metadatenmanagement bezieht sich ausschließlich auf die einheitliche Benennung und Ablagestruktur von Dateien."
+    ],
+    correct: 1, topic: "Datenverwaltung"
+  },
+  {
+    text: "Wie tragen ETL-Prozesse zur Harmonisierung von Daten aus verschiedenen operativen Systemen bei?",
+    options: [
+      "Sie übertragen Daten unverändert und ohne jede Anpassung direkt von den Quellsystemen in das Zielsystem.",
+      "Sie übersetzen unterschiedliche Bezeichnungen, Formate und Kodierungen mithilfe zentraler Mapping-Tabellen in einen einheitlichen Standard.",
+      "Sie identifizieren widersprüchliche Datensätze und löschen diese ersatzlos aus dem Datenbestand.",
+      "ETL-Prozesse harmonisieren Daten ausschließlich auf der Darstellungsebene innerhalb der Dashboard-Schicht."
+    ],
+    correct: 1, topic: "ETL"
+  },
+  {
+    text: "Warum ist die Datenhistorisierung im Data Warehouse für Zeitreihenanalysen wichtig?",
+    options: [
+      "Sie reduziert den Speicherbedarf des Data Warehouse durch die gezielte Löschung veralteter Datensätze.",
+      "Sie bewahrt vergangene Zustände von Stammdaten, sodass historische Auswertungen stets den damals gültigen Zuordnungen entsprechen und Trendanalysen nicht durch nachträgliche Änderungen verfälscht werden.",
+      "Historisierte Daten unterliegen besonderen datenschutzrechtlichen Einschränkungen und dürfen für Analysen nicht verwendet werden.",
+      "Sie dient ausschließlich der gesetzlich vorgeschriebenen Archivierung und hat keinen Mehrwert für analytische Auswertungen."
+    ],
+    correct: 1, topic: "Architektur"
+  },
+  {
+    text: "Wie tragen Data Quality Standards zur Fehlerreduktion bei?",
+    options: [
+      "Sie schreiben den Verzicht auf bestimmte Werkzeuge wie Tabellenkalkulationsprogramme im gesamten Unternehmen vor.",
+      "Sie legen verbindliche Regeln für die Erfassung, Prüfung und Pflege von Daten fest und verhindern so, dass Fehler bereits an der Quelle entstehen.",
+      "Data Quality Standards sind ein alternatives Konzept zu ETL-Tools und erfüllen dieselbe technische Funktion.",
+      "Sie gelten ausschließlich für extern bezogene Daten, da interne Systeme als grundsätzlich fehlerfrei gelten."
+    ],
+    correct: 1, topic: "Datenqualität"
+  },
+  {
+    text: "Welche Methode eignet sich zur Duplikatserkennung in großen Datensätzen?",
+    options: [
+      "Die manuelle Sichtprüfung aller Datensätze durch Mitarbeitende des Vertriebsteams anhand von Exportlisten.",
+      "Probabilistische Verfahren wie Fuzzy-Matching, die Ähnlichkeitswerte zwischen Datensätzen berechnen und potenzielle Duplikate zur manuellen Prüfung vorschlagen.",
+      "Die Konvertierung aller Datensätze in ein einheitliches Klartextformat, das anschließend zeilenweise verglichen wird.",
+      "Die automatische Eliminierung von Datensätzen, die identische Werte in einer beliebigen Spalte aufweisen."
+    ],
+    correct: 1, topic: "Datenqualität"
+  },
+  {
+    text: "Was leisten Fuzzy-Matching-Algorithmen bei der Bereinigung von Kundendaten?",
+    options: [
+      "Sie identifizieren Kundendatensätze, deren Werte statistisch stark vom Durchschnitt abweichen, und entfernen diese automatisch.",
+      "Sie erkennen nicht-exakte Übereinstimmungen wie \"Müller\" und \"Mueller\" und schlagen diese Datensätze als potenziell identisch zur Zusammenführung vor.",
+      "Sie ersetzen die bestehende Kundendatenbank durch Daten eines externen, geprüften Adressdienstleisters.",
+      "Sie übersetzen Kundenstammdaten automatisch in andere Sprachen, um internationale Datenpools zu vereinheitlichen."
+    ],
+    correct: 1, topic: "Datenqualität"
+  },
+  {
+    text: "Wie verbessern strukturierte Datenmodelle die Performance von BI-Abfragen?",
+    options: [
+      "Indem sie sämtliche Unternehmensdaten in einer einzigen, nicht normalisierten Tabelle ohne Fremdschlüsselbeziehungen ablegen.",
+      "Durch den Einsatz denormalisierter Sternschemata, die die Anzahl notwendiger Joins minimieren und Abfragen auf großen Datenmengen erheblich beschleunigen.",
+      "Strukturierte Datenmodelle haben keinen nachweisbaren Einfluss auf die Ausführungsgeschwindigkeit von Datenbankabfragen.",
+      "Indem sie alle Abfrageverarbeitungen ausschließlich an eine externe Python-Laufzeitumgebung delegieren."
+    ],
+    correct: 1, topic: "Datenmodellierung"
+  },
+  {
+    text: "Welchen Vorteil hat das Sternschema gegenüber dem Schneeflockenschema?",
+    options: [
+      "Es benötigt weniger Speicherplatz, weil Dimensionsdaten durch konsequente Normalisierung dedupliziert werden.",
+      "Es ermöglicht schnellere Abfragen, weil denormalisierte Dimensionstabellen die Anzahl der erforderlichen Joins reduzieren.",
+      "Es eignet sich als einziges Modellierungskonzept ausschließlich für den Einsatz in Data-Lake-Umgebungen.",
+      "Es ist die einzige Modellierungsform, die von Cloud-basierten Data-Warehouse-Diensten vollständig unterstützt wird."
+    ],
+    correct: 1, topic: "Datenmodellierung"
+  },
+  {
+    text: "Welchen Nachteil hat das Schneeflockenschema gegenüber dem Sternschema?",
+    options: [
+      "Es verbraucht durch fehlende Normalisierung deutlich mehr Speicherplatz als das Sternschema.",
+      "Es führt zu komplexeren SQL-Abfragen mit einer höheren Anzahl von Joins, was die Abfragegeschwindigkeit reduzieren kann.",
+      "Es unterstützt keine mehrstufigen Dimensionshierarchien und ist daher für Zeitreihenanalysen ungeeignet.",
+      "Es erlaubt keine Verknüpfung von Fakten- und Dimensionstabellen und ist deshalb im BI-Bereich kaum einsetzbar."
+    ],
+    correct: 1, topic: "Datenmodellierung"
+  },
+  {
+    text: "Wie trägt Cloud Computing zur Skalierung von BI-Lösungen bei?",
+    options: [
+      "Cloud-Angebote richten sich primär an kleine Unternehmen und sind für skalierbare Enterprise-BI-Lösungen ungeeignet.",
+      "Rechenleistung und Speicherkapazität lassen sich bei wachsendem Datenvolumen flexibel und ohne Hardwareanschaffung erhöhen.",
+      "Der Einsatz von Cloud-Infrastruktur macht eine strukturierte Datenmodellierung im BI-Kontext überflüssig.",
+      "Cloud-Plattformen unterstützen ausschließlich die Verarbeitung strukturierter Datensätze aus relationalen Quellsystemen."
+    ],
+    correct: 1, topic: "Cloud & Big Data"
+  },
+  {
+    text: "Worin liegt der Vorteil eines Pay-as-you-go-Modells für BI-Kosten?",
+    options: [
+      "Es garantiert eine planbare, monatlich gleichbleibende Gebühr unabhängig von der tatsächlichen Nutzungsintensität.",
+      "Das Unternehmen zahlt ausschließlich für die tatsächlich genutzte Rechen- und Speicherkapazität, was bei schwankendem Analysebedarf besonders kosteneffizient ist.",
+      "Pay-as-you-go-Modelle sind in der Gesamtbetrachtung stets teurer als der Eigenbetrieb einer On-Premise-Infrastruktur.",
+      "Dieses Abrechnungsmodell ist ausschließlich für Datenbanklizenzen verfügbar und gilt nicht für BI-Analyse-Werkzeuge."
+    ],
+    correct: 1, topic: "Cloud & Big Data"
+  },
+  {
+    text: "Welche Folge hat eine unzureichende Dokumentation der Datenherkunft?",
+    options: [
+      "Fehlende Herkunftsdokumentation verbessert die Systemperformance, weil Metadaten weniger Speicher beanspruchen.",
+      "Fehler in Berichten lassen sich nicht oder nur mit großem Zeitaufwand zurückverfolgen, was das Vertrauen in BI-Analysen untergräbt und Entscheidungen auf Basis ungeprüfter Zahlen begünstigt.",
+      "Die fehlende Dokumentation ist ausschließlich für externe Prüfer relevant und hat keine Auswirkungen auf interne Entscheidungsprozesse.",
+      "Zeitgemäße BI-Werkzeuge dokumentieren die Datenherkunft vollständig automatisch, sodass manueller Dokumentationsaufwand entfällt."
+    ],
+    correct: 1, topic: "Datenverwaltung"
+  },
+  {
+    text: "Welche Aussage beschreibt den Zweck eines Staging-Bereichs in der BI-Architektur?",
+    options: [
+      "Der Staging-Bereich ist die Testumgebung, in der fertige Dashboards vor ihrer offiziellen Veröffentlichung geprüft werden.",
+      "Er dient als temporäres Zwischenlager, in das Rohdaten aus den Quellsystemen ohne Transformation kopiert werden, um die Quellen zu entlasten und die Extraktion zu beschleunigen.",
+      "Im Staging-Bereich werden ausschließlich extern bezogene Daten zwischengespeichert, bevor sie in das Data Warehouse überführt werden.",
+      "Der Staging-Bereich ist eine alternative Bezeichnung für das Data Warehouse und erfüllt dieselbe Funktion."
+    ],
+    correct: 1, topic: "Architektur"
+  },
+  {
+    text: "Welches Problem wird durch Schema-on-Read im Data Lake gelöst?",
+    options: [
+      "Es behebt Sicherheitslücken bei der Übertragung sensibler Daten in Cloud-basierte Speichersysteme.",
+      "Daten müssen vor dem Speichern nicht in ein festes Schema gezwungen werden, sodass auch neue Analysefragestellungen auf historische Rohdaten angewendet werden können.",
+      "Es stellt sicher, dass personenbezogene Daten gemäß DSGVO vor der Speicherung automatisch anonymisiert werden.",
+      "Es ermöglicht die automatische Vervollständigung fehlender Feldwerte durch statistische Schätzverfahren beim Ladevorgang."
+    ],
+    correct: 1, topic: "Architektur"
+  },
+  {
+    text: "Warum ist die lose Kopplung zwischen Quellsystemen und BI-System ein architektonisches Grundprinzip?",
+    options: [
+      "Weil eine technisch enge Kopplung zwischen Systemen gegen geltende Datenschutzvorschriften verstößt.",
+      "Damit das BI-System bei Ausfall oder Wartung der Quellsysteme weiterläuft und die operativen Systeme nicht durch analytische Abfragen belastet werden.",
+      "Lose Kopplung ist ein veraltetes Architekturkonzept, das in modernen Cloud-basierten BI-Lösungen nicht mehr angewendet wird.",
+      "Sie stellt sicher, dass alle Änderungen in Quellsystemen in Echtzeit und ohne Verzögerung im BI-System sichtbar sind."
+    ],
+    correct: 1, topic: "Architektur"
+  }
+];
+
+const LETTERS = ['A','B','C','D'];
+let questions = [], currentIdx = 0, answers = {};
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length-1; i>0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function initQuiz() {
+  questions = shuffle(ALL_QUESTIONS).map(q => {
+    const opts = q.options.map((text,i) => ({text, orig: i}));
+    const sh = shuffle(opts);
+    return { ...q, options: sh.map(o=>o.text), correct: sh.findIndex(o=>o.orig===q.correct) };
+  });
+  currentIdx = 0;
+  answers = {};
+  document.getElementById('quiz-screen').style.display = 'block';
+  document.getElementById('result-screen').style.display = 'none';
+
+  const rBox = document.getElementById('restart-confirm-box');
+  const rBtn = document.getElementById('btn-restart-quiz');
+  if (rBox) rBox.style.display = 'none';
+  if (rBtn) rBtn.style.display = 'inline-flex';
+
+  renderQuestion();
+}
+
+function requestRestart() {
+  const rBtn = document.getElementById('btn-restart-quiz');
+  const rBox = document.getElementById('restart-confirm-box');
+  if (rBtn) rBtn.style.display = 'none';
+  if (rBox) rBox.style.display = 'flex';
+}
+
+function confirmRestart(agree) {
+  if (agree) {
+    initQuiz();
+  } else {
+    const rBox = document.getElementById('restart-confirm-box');
+    const rBtn = document.getElementById('btn-restart-quiz');
+    if (rBox) rBox.style.display = 'none';
+    if (rBtn) rBtn.style.display = 'inline-flex';
+  }
+}
+
+function renderQuestion() {
+  const q = questions[currentIdx];
+  const total = questions.length;
+  const done = Object.keys(answers).length;
+  const pct = Math.round((done/total)*100);
+  const correct = Object.entries(answers).filter(([i,v])=>v!==-1&&questions[i].correct===v).length;
+  const wrong   = Object.entries(answers).filter(([i,v])=>v!==-1&&questions[i].correct!==v).length;
+  const open    = total - done;
+
+  document.getElementById('progress-bar').style.width = pct+'%';
+  document.getElementById('progress-pct').textContent = pct+' % abgeschlossen';
+  document.getElementById('stat-correct').textContent = correct;
+  document.getElementById('stat-wrong').textContent   = wrong;
+  document.getElementById('stat-skip').textContent    = open;
+  document.getElementById('q-label').textContent = 'Themenbereich: '+q.topic;
+  document.getElementById('q-text').textContent  = q.text;
+
+  const isAnswered = currentIdx in answers;
+  const chosen = answers[currentIdx];
+  const container = document.getElementById('options-container');
+  container.innerHTML = '';
+
+  q.options.forEach((opt,i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.disabled = isAnswered;
+    let cls='', icon='';
+    if (isAnswered) {
+      if (i===q.correct) {
+        cls = (chosen===i) ? 'correct' : 'revealed-correct';
+        icon = '<span class="check-icon" style="color:var(--success)">✓</span>';
+      } else if (i===chosen && chosen!==q.correct) {
+        cls = 'wrong';
+        icon = '<span class="check-icon" style="color:var(--danger)">✗</span>';
+      }
+    }
+    if (cls) btn.classList.add(cls);
+    btn.innerHTML = `<span class="option-letter">${LETTERS[i]}</span><span style="flex:1">${opt}</span>${icon}`;
+    if (!isAnswered) btn.onclick = () => selectAnswer(i);
+    container.appendChild(btn);
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback';
+  if (isAnswered) {
+    if (chosen===-1) {
+      fb.className='feedback show skip-fb';
+      fb.innerHTML=`⏭ &nbsp;Übersprungen. Richtige Antwort: <strong>${LETTERS[q.correct]}) ${q.options[q.correct]}</strong>`;
+    } else if (chosen===q.correct) {
+      fb.className='feedback show correct-fb';
+      fb.innerHTML='✓ &nbsp;<strong>Richtig!</strong>';
+    } else {
+      fb.className='feedback show wrong-fb';
+      fb.innerHTML=`✗ &nbsp;<strong>Falsch.</strong> Richtige Antwort: <strong>${LETTERS[q.correct]}) ${q.options[q.correct]}</strong>`;
+    }
+  }
+
+  document.getElementById('btn-prev').disabled = (currentIdx===0);
+  document.getElementById('btn-skip').style.display = isAnswered ? 'none' : '';
+  document.getElementById('btn-next').style.display = (currentIdx<total-1) ? '' : 'none';
+  document.getElementById('btn-finish').style.display = (done===total) ? '' : 'none';
+}
+
+function selectAnswer(idx) {
+  answers[currentIdx] = idx;
+  renderQuestion();
+}
+
+function skipQuestion() {
+  answers[currentIdx] = -1;
+  renderQuestion();
+  if (currentIdx < questions.length-1) navigate(1);
+}
+
+function navigate(dir) {
+  const n = currentIdx+dir;
+  if (n>=0 && n<questions.length) { currentIdx=n; renderQuestion(); }
+}
+
+function finishQuiz() {
+  const total = questions.length;
+  const correct = Object.entries(answers).filter(([i,v])=>v!==-1&&questions[i].correct===v).length;
+  const wrong   = Object.entries(answers).filter(([i,v])=>v!==-1&&questions[i].correct!==v).length;
+  const skip    = Object.values(answers).filter(v=>v===-1).length;
+  const pct = Math.round((correct/total)*100);
+
+  document.getElementById('quiz-screen').style.display='none';
+  document.getElementById('result-screen').style.display='block';
+  document.getElementById('r-correct').textContent=correct;
+  document.getElementById('r-wrong').textContent=wrong;
+  document.getElementById('r-skip').textContent=skip;
+  document.getElementById('score-pct-label').textContent=pct+'%';
+  document.getElementById('result-title').textContent=pct+'% erreicht';
+  document.getElementById('result-sub').textContent=correct+' von '+total+' Fragen richtig beantwortet';
+
+  const ring = document.getElementById('ring-fill');
+  const color = pct>=85?'#0f6e56':pct>=70?'#185fa5':pct>=50?'#ba7517':'#a32d2d';
+  ring.style.stroke=color;
+  setTimeout(()=>{ ring.style.strokeDashoffset=314-(pct/100)*314; },100);
+
+  let gradeText, gradeBg, gradeColor;
+  if      (pct>=90) { gradeText='Sehr gut (1) · 🏆 Ausgezeichnet! Prüfungsfit.';       gradeBg='#e1f5ee'; gradeColor='#0f6e56'; }
+  else if (pct>=75) { gradeText='Gut (2) · 👍 Gut! Noch etwas üben.';                  gradeBg='#e1f5ee'; gradeColor='#0f6e56'; }
+  else if (pct>=60) { gradeText='Befriedigend (3) · 📚 Schwachstellen wiederholen.';   gradeBg='#faeeda'; gradeColor='#854f0b'; }
+  else if (pct>=50) { gradeText='Ausreichend (4) · ⚠️ Knapp – mehr Lernzeit einplanen.'; gradeBg='#faeeda'; gradeColor='#854f0b'; }
+  else              { gradeText='Nicht genügend (5) · ❌ Lernstoff nochmals durcharbeiten.'; gradeBg='#fcebeb'; gradeColor='#a32d2d'; }
+
+  const gb = document.getElementById('grade-bar');
+  gb.style.background=gradeBg; gb.style.color=gradeColor;
+  gb.style.border='1px solid '+color+'44';
+  gb.textContent=gradeText;
+}
+
+function toggleReview() {
+  const sec = document.getElementById('review-section');
+  if (sec.style.display!=='none') { sec.style.display='none'; return; }
+  sec.style.display='block';
+  const list = document.getElementById('review-list');
+  list.innerHTML='';
+  questions.forEach((q,i) => {
+    const chosen=answers[i];
+    const ok=chosen!==undefined&&chosen!==-1&&chosen===q.correct;
+    const item=document.createElement('div');
+    item.className='review-item '+(ok?'ok':'nok');
+    let ans='';
+    if      (chosen===undefined) ans='<span style="color:#9ca3af">Nicht beantwortet</span>';
+    else if (chosen===-1)        ans=`Übersprungen · Richtig: <span class="ok-txt">${LETTERS[q.correct]}) ${q.options[q.correct]}</span>`;
+    else if (ok)                 ans=`<span class="ok-txt">✓ ${LETTERS[chosen]}) ${q.options[chosen]}</span>`;
+    else                         ans=`<span class="nok-txt">✗ ${LETTERS[chosen]}) ${q.options[chosen]}</span> · Richtig: <span class="ok-txt">${LETTERS[q.correct]}) ${q.options[q.correct]}</span>`;
+    item.innerHTML=`<div class="review-q">Frage ${i+1}: ${q.text}</div><div class="review-a">${ans}</div>`;
+    list.appendChild(item);
+  });
+}
+
+function restartQuiz() {
+  document.getElementById('review-section').style.display='none';
+  initQuiz();
+}
+
+document.addEventListener('keydown', e => {
+  if (document.getElementById('result-screen').style.display!=='none') return;
+  const isAnswered = currentIdx in answers;
+  if (!isAnswered) {
+    if      (e.key==='a'||e.key==='A') selectAnswer(0);
+    else if (e.key==='b'||e.key==='B') selectAnswer(1);
+    else if (e.key==='c'||e.key==='C') selectAnswer(2);
+    else if (e.key==='d'||e.key==='D') selectAnswer(3);
+    else if (e.key==='s'||e.key==='S') skipQuestion();
+  }
+  if      (e.key==='ArrowRight') navigate(1);
+  else if (e.key==='ArrowLeft')  navigate(-1);
+});
+
+initQuiz();
+</script>
+</body>
+</html>

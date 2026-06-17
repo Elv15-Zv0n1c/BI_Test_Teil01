@@ -1,0 +1,6 @@
+{
+  "name": "BI Quiz - Teil 1",
+  "description": "Ein interaktives Quiz für den Kurs „Business Intelligence – Teil 1“ der Wirtschaftsakademie Wien.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
